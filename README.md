@@ -6,7 +6,7 @@
 
 The platform introduces an additional confirmation layer for transfers by requiring **voice verification of the recipient's name** before settlement, while prominently displaying the recipient's identity before the sender confirms the transaction.
 
-ZWallet also integrates with **JoPACC's sandbox Open Banking APIs** to simulate a real-world pooled-custody flow where customer funds move through the application's settlement bank account.
+ZWallet also integrates with **JoPACC's sandbox Open Banking APIs** to model a realistic pooled-custody flow where customer funds move through the application's settlement bank account.
 
 ---
 
@@ -14,16 +14,16 @@ ZWallet also integrates with **JoPACC's sandbox Open Banking APIs** to simulate 
 
 ### 🔐 Voice-Verified Transfers
 
-ZWallet adds an extra layer of protection before completing a transfer.
+ZWallet adds an additional protection layer before completing a transfer.
 
-Before the transaction is settled, the sender is required to:
+Before the transaction is settled, the sender must:
 
 * Review the recipient's identity.
 * Confirm the recipient's name.
 * Say the recipient's name aloud.
-* Complete the transfer only after successful confirmation.
+* Complete the transfer after successful verification.
 
-This helps reduce mistakes caused by sending money to the wrong person or account.
+This helps reduce accidental transfers caused by selecting or entering the wrong recipient.
 
 ---
 
@@ -36,17 +36,17 @@ The recipient's identity is displayed clearly before the user confirms a transfe
 │        Confirm Transfer          │
 ├──────────────────────────────────┤
 │                                  │
-│  Sending to                       │
+│  Sending to                      │
 │                                  │
-│  👤 Ahmad Al-Hassan               │
-│     IBAN: JO••••••••••1234       │
+│  👤 Ahmad Al-Hassan              │
+│     IBAN: JO••••••••••1234      │
 │                                  │
-│  Amount                           │
-│  💰 50.00 JOD                     │
+│  Amount                          │
+│  💰 50.00 JOD                    │
 │                                  │
-│  🎙️ Say recipient's name         │
+│  🎙️ Say recipient's name        │
 │                                  │
-│          [ Confirm ]              │
+│          [ Confirm ]             │
 │                                  │
 └──────────────────────────────────┘
 ```
@@ -55,12 +55,12 @@ The recipient's identity is displayed clearly before the user confirms a transfe
 
 ### 🏦 Open Banking Integration
 
-ZWallet integrates with **JoPACC's sandbox Open Banking APIs** to model realistic banking operations.
+ZWallet integrates with **JoPACC's sandbox Open Banking APIs** to simulate realistic banking operations.
 
-The application supports:
+Supported operations include:
 
 * 🔗 Bank account linking
-* 💰 Account balance verification
+* 💰 Balance verification
 * 🔎 IBAN confirmation
 * 💸 Payment initiation
 * 🔄 External transfers
@@ -86,7 +86,7 @@ Customer Bank Account
     Wallet Balance
 ```
 
-The wallet balance is increased only after the payment is successfully **Accepted**.
+The wallet balance increases only after the payment reaches an **Accepted** state.
 
 ---
 
@@ -99,28 +99,28 @@ ZWallet Customer
        │
        │ Transfer Request
        ▼
-┌──────────────────┐
-│ ZWallet Settlement│
-│   Bank Account   │
-└────────┬─────────┘
-         │
-         │ PIS
-         ▼
-┌──────────────────┐
-│ Recipient Bank   │
-│      IBAN        │
-└──────────────────┘
+┌────────────────────┐
+│ ZWallet Settlement │
+│    Bank Account    │
+└─────────┬──────────┘
+          │
+          │ PIS
+          ▼
+┌────────────────────┐
+│   Recipient Bank   │
+│       IBAN         │
+└────────────────────┘
 ```
 
-The customer's identity is attributed through the payment's `remittanceInformation`, even though the actual bank account used for settlement belongs to the application.
+The customer's identity is attributed through the payment's `remittanceInformation`, even though the underlying bank account belongs to the application's settlement account.
 
 ---
 
 ### 🔄 Internal Transfers
 
-Transfers between two ZWallet users are handled entirely through the internal ledger.
+Transfers between two ZWallet users are handled entirely through the internal wallet ledger.
 
-**No external PIS transaction is required.**
+**No external PIS call is required.**
 
 ```text
 User A Wallet
@@ -130,7 +130,7 @@ User A Wallet
 User B Wallet
 ```
 
-This makes internal transfers faster and avoids unnecessary external banking operations.
+This allows internal transfers to remain within the ZWallet ecosystem.
 
 ---
 
@@ -138,27 +138,27 @@ This makes internal transfers faster and avoids unnecessary external banking ope
 
 ```text
 ┌─────────────────────┐
-│    Create Account   │
-│      / Login        │
+│   Create Account    │
+│       / Login       │
 └──────────┬──────────┘
            │
            ▼
 ┌─────────────────────┐
-│    Link Bank        │
-│      Account        │
+│     Link Bank       │
+│       Account       │
 └──────────┬──────────┘
            │
            ▼
 ┌─────────────────────┐
-│      Top-Up         │
-│  Bank → Settlement  │
-│  Account → Wallet   │
+│       Top-Up        │
+│ Bank → Settlement   │
+│ Account → Wallet    │
 └──────────┬──────────┘
            │
            ▼
 ┌─────────────────────┐
 │   Choose Recipient  │
-│   & Transfer Type   │
+│  & Transfer Amount  │
 └──────────┬──────────┘
            │
            ▼
@@ -174,10 +174,10 @@ This makes internal transfers faster and avoids unnecessary external banking ope
 └──────────┬──────────┘
            │
            ▼
-      ┌────┴────┐
+      ┌────┴─────┐
       │ Transfer │
       │ Confirmed│
-      └────┬────┘
+      └────┬─────┘
            │
       ┌────┴──────────┐
       ▼               ▼
@@ -203,7 +203,7 @@ This makes internal transfers faster and avoids unnecessary external banking ope
                               ▼
                     ┌────────────────────┐
                     │    NestJS Backend  │
-                    │    TypeScript      │
+                    │     TypeScript     │
                     └─────────┬──────────┘
                               │
                 ┌─────────────┼─────────────┐
@@ -216,10 +216,11 @@ This makes internal transfers faster and avoids unnecessary external banking ope
                                              │
                                              ▼
                                       ┌─────────────┐
-                                      │ Bank APIs   │
-                                      │ Accounts    │
-                                      │ CAF         │
-                                      │ PIS         │
+                                      │  Bank APIs  │
+                                      │  Accounts   │
+                                      │  CAF        │
+                                      │  Balances   │
+                                      │  PIS        │
                                       └─────────────┘
 ```
 
@@ -227,40 +228,36 @@ This makes internal transfers faster and avoids unnecessary external banking ope
 
 # 🧩 Transfer Types
 
-| Transfer Type        | External API | Settlement Account | Ledger |
-| -------------------- | -----------: | -----------------: | -----: |
-| 🏠 Internal Transfer |            ❌ |                  ❌ |      ✅ |
-| 💰 Customer Top-Up   |        ✅ PIS |                  ✅ |      ✅ |
-| 💸 External Transfer |        ✅ PIS |                  ✅ |      ✅ |
+| Transfer Type        | External API | Settlement Account | Internal Ledger |
+| -------------------- | -----------: | -----------------: | --------------: |
+| 🏠 Internal Transfer |            ❌ |                  ❌ |               ✅ |
+| 💰 Customer Top-Up   |        ✅ PIS |                  ✅ |               ✅ |
+| 💸 External Transfer |        ✅ PIS |                  ✅ |               ✅ |
 
 ---
 
 # 🏦 Admin / Settlement Account
 
-ZWallet uses a dedicated **ADMIN** user to represent the application's pooled settlement account.
+ZWallet uses a dedicated **ADMIN** user to represent the application's pooled settlement bank account.
 
-Every user has a role:
+Each user has one of the following roles:
 
 ```text
 ADMIN
 CUSTOMER
 ```
 
-Exactly one `ADMIN` account is expected to represent the application's settlement bank account.
+Exactly one `ADMIN` user should exist.
 
-The admin setup can be initialized with:
+The admin represents the application's settlement account and is used as the underlying bank account for external money movement.
+
+Initialize the admin account with:
 
 ```bash
 npm run seed:admin
 ```
 
-The command is **idempotent** and can safely be executed again.
-
-The settlement IBAN is configured through:
-
-```env
-ADMIN_SETTLEMENT_IBAN=
-```
+The command is **idempotent** and safe to run multiple times.
 
 ---
 
@@ -272,8 +269,9 @@ ADMIN_SETTLEMENT_IBAN=
   <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" />
   <img src="https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white" />
   <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" />
-  <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" />
+  <img src="https://img.shields.io/badge/React_Router-CA4245?style=for-the-badge&logo=react-router&logoColor=white" />
   <img src="https://img.shields.io/badge/TanStack_Query-FF4154?style=for-the-badge&logo=react-query&logoColor=white" />
+  <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" />
 </p>
 
 ### ⚙️ Backend
@@ -295,8 +293,8 @@ ADMIN_SETTLEMENT_IBAN=
 **JoPACC Open Banking Sandbox**
 
 * Accounts API
-* CAF
 * Balances API
+* Confirmation of Availability of Funds (CAF)
 * IBAN Confirmation
 * Payment Initiation Service (PIS)
 
@@ -313,7 +311,7 @@ cd zwallet
 
 ---
 
-## 2️⃣ Backend Setup
+# ⚙️ Backend Setup
 
 ```bash
 cd backend
@@ -324,12 +322,6 @@ Create your environment file:
 
 ```bash
 cp .env.example .env
-```
-
-Configure your PostgreSQL connection:
-
-```env
-DATABASE_URL="postgresql://..."
 ```
 
 Run Prisma migrations:
@@ -370,11 +362,24 @@ API prefix:
 
 ---
 
-## 3️⃣ Frontend Setup
+# 🎨 Frontend Setup
+
+Open a new terminal:
 
 ```bash
 cd frontend
 npm install
+```
+
+Create your environment file:
+
+```bash
+cp .env.example .env
+```
+
+Start the development server:
+
+```bash
 npm run dev
 ```
 
@@ -384,23 +389,169 @@ Frontend:
 http://localhost:5173
 ```
 
-If required, configure:
+---
+
+# 🔐 Environment Variables
+
+ZWallet requires environment variables for the frontend, backend, database, authentication, and JoPACC integration.
+
+> ⚠️ **Never commit real `.env` files containing passwords, API tokens, database credentials, JWT secrets, or private keys.**
+
+---
+
+## 🎨 Frontend `.env`
+
+Create:
+
+```text
+frontend/.env
+```
 
 ```env
-VITE_API_BASE_URL=
+VITE_API_BASE_URL=http://localhost:3000/api
 ```
+
+The frontend uses `VITE_API_BASE_URL` to communicate with the backend API.
+
+---
+
+## ⚙️ Backend `.env`
+
+Create:
+
+```text
+backend/.env
+```
+
+Use the following structure and replace the placeholder values with your own credentials:
+
+```env
+# ==============================
+# Database
+# ==============================
+
+DATABASE_URL="postgresql://USER:PASSWORD@HOST/DATABASE?sslmode=require"
+
+
+# ==============================
+# Application
+# ==============================
+
+PORT=3000
+
+
+# ==============================
+# Authentication
+# ==============================
+
+JWT_SECRET="your-secure-jwt-secret"
+JWT_EXPIRES_IN="7d"
+
+
+# ==============================
+# JoPACC Sandbox APIs
+# ==============================
+
+JOPACC_AUTH_TOKEN="your-jopacc-auth-token"
+
+JOPACC_ACCOUNTS_BASE_URL="http://jpcjofsdev.apigw-az-eu.webmethods.io/gateway/Accounts/v0.4.3"
+
+JOPACC_BALANCES_BASE_URL="https://jpcjofsdev.apigw-az-eu.webmethods.io/gateway/Balances/v0.4.3"
+
+JOPACC_CAF_BASE_URL="https://jpcjofsdev.apigw-az-eu.webmethods.io/gateway/Confirmation of Availability of Funds/v0.4.3"
+
+JOPACC_IBAN_CONFIRMATION_BASE_URL="https://jpcjofsdev.apigw-az-eu.webmethods.io/gateway/IBAN Confirmation/v0.4.3"
+
+JOPACC_PIS_BASE_URL="https://jpcjofsdev.apigw-az-eu.webmethods.io/gateway/RFC - Payment Initiation Services (PIS)/v0.4.3"
+
+JOPACC_FINANCIAL_ID="your-financial-id"
+
+JOPACC_CUSTOMER_USER_AGENT="ZWallet-Backend/1.0"
+
+
+# ==============================
+# JWS Signing
+# ==============================
+
+JWS_SIGNING_PRIVATE_KEY_PATH="./.jws-keys/private.pem"
+
+JWS_SIGNING_PUBLIC_KEY_PATH="./.jws-keys/public.pem"
+
+JWS_SIGNING_KEY_ID="zwallet-mock-1"
+
+
+# ==============================
+# Admin / Settlement Account
+# ==============================
+
+ADMIN_EMAIL="admin@zwallet.local"
+
+ADMIN_PASSWORD="your-secure-admin-password"
+
+ADMIN_SETTLEMENT_IBAN="your-settlement-iban"
+```
+
+---
+
+# 🔑 Environment Variables Overview
+
+| Variable                            | Purpose                                   |
+| ----------------------------------- | ----------------------------------------- |
+| `DATABASE_URL`                      | PostgreSQL database connection            |
+| `PORT`                              | Backend server port                       |
+| `JWT_SECRET`                        | Secret used for JWT signing               |
+| `JWT_EXPIRES_IN`                    | JWT expiration duration                   |
+| `JOPACC_AUTH_TOKEN`                 | Authentication token for JoPACC sandbox   |
+| `JOPACC_ACCOUNTS_BASE_URL`          | JoPACC Accounts API                       |
+| `JOPACC_BALANCES_BASE_URL`          | JoPACC Balances API                       |
+| `JOPACC_CAF_BASE_URL`               | Confirmation of Availability of Funds API |
+| `JOPACC_IBAN_CONFIRMATION_BASE_URL` | IBAN Confirmation API                     |
+| `JOPACC_PIS_BASE_URL`               | Payment Initiation Service API            |
+| `JOPACC_FINANCIAL_ID`               | TPP financial identifier                  |
+| `JOPACC_CUSTOMER_USER_AGENT`        | Client identification                     |
+| `JWS_SIGNING_PRIVATE_KEY_PATH`      | JWS private signing key                   |
+| `JWS_SIGNING_PUBLIC_KEY_PATH`       | JWS public signing key                    |
+| `JWS_SIGNING_KEY_ID`                | JWS signing key identifier                |
+| `ADMIN_EMAIL`                       | ZWallet admin account                     |
+| `ADMIN_PASSWORD`                    | Admin account password                    |
+| `ADMIN_SETTLEMENT_IBAN`             | Application settlement bank account       |
+
+---
+
+# 🛡️ Security
+
+Make sure the following files are included in `.gitignore`:
+
+```gitignore
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Generated JWS keys
+.jws-keys/
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+```
+
+This allows the project to contain safe `.env.example` files while keeping sensitive credentials private.
 
 ---
 
 # ⚠️ Known JoPACC Sandbox Behavior
 
-The project documents several behaviors discovered while integrating with the JoPACC sandbox.
+During the integration with the JoPACC sandbox, several important behaviors were identified.
 
 ### 🔹 PIS Debtor Information
 
 The sandbox expects **creditor-side information only** for PIS requests.
 
-Debtor information such as:
+The following debtor-side fields should not be included:
 
 ```text
 dbtr
@@ -408,24 +559,32 @@ dbtrAcct
 dbtrAgt
 ```
 
-must not be included in the PIS payload.
-
 The debtor is treated as implicit by the sandbox.
 
 ---
 
 ### 🔹 Account Lock Flags
 
-The sandbox's:
+The following flags:
 
 ```text
 lockedForDebit
 lockedForCredit
 ```
 
-flags do not prevent PIS transactions in the tested scenarios.
+do not prevent PIS transactions in the tested sandbox scenarios.
 
-They mainly affect account and CAF lookups.
+They mainly affect Accounts and CAF lookups.
+
+---
+
+### 🔹 Sandbox Account Balances
+
+The sandbox test data contains an unusual relationship between account balances and lock flags.
+
+Accounts with available funds may have lock flags enabled, while fully unlocked accounts may have zero balances.
+
+Since the tested PIS flow does not block transactions based on those lock flags, this does not prevent the current integration.
 
 ---
 
@@ -461,7 +620,7 @@ header.
 
 ### 🔹 Required Identification Headers
 
-JoPACC requests require a common set of identification headers:
+JoPACC APIs require a common set of identification headers:
 
 ```text
 x-financial-id
@@ -487,33 +646,96 @@ buildCustomerHeaders()
 
 ---
 
+# 🧠 Financial Flow
+
+ZWallet models three primary financial flows.
+
+## 💰 Top-Up
+
+```text
+Customer Bank Account
+          │
+          │ PIS
+          ▼
+   ZWallet Settlement
+      Bank Account
+          │
+          ▼
+    Customer Wallet
+```
+
+The wallet balance is increased only after the PIS transaction reaches:
+
+```text
+Accepted
+```
+
+---
+
+## 💸 External Transfer
+
+```text
+Customer
+    │
+    │ Transfer Request
+    ▼
+ZWallet Wallet
+    │
+    ▼
+Settlement Bank Account
+    │
+    │ PIS
+    ▼
+Recipient IBAN
+```
+
+The payment is attributed to the sending customer through `remittanceInformation`.
+
+---
+
+## 🔄 Internal Transfer
+
+```text
+Customer A
+    │
+    │ Internal Ledger
+    ▼
+Customer B
+```
+
+No external banking API is required.
+
+---
+
 # 🎯 Project Goals
 
 ### 🛡️ Safer Transfers
 
-Reduce accidental transfers by making recipient identity highly visible and adding voice confirmation.
+Reduce accidental transfers through recipient identity confirmation and voice verification.
 
 ### 🏦 Realistic Fintech Architecture
 
-Model real-world banking flows instead of treating the wallet as a simple database balance.
+Model realistic banking and settlement flows instead of treating the wallet as a simple balance table.
 
 ### 🔗 Open Banking Integration
 
-Connect the application to banking infrastructure through standardized Open Banking APIs.
+Connect the application with banking infrastructure through Open Banking APIs.
 
 ### ⚡ Reliable Transactions
 
-Ensure wallet balances are updated only after successful payment processing.
+Update wallet balances only after successful payment processing.
 
-### 🧩 Clear Separation
+### 🧩 Clear Financial Separation
 
-Separate internal wallet transactions from external banking transactions.
+Separate internal wallet operations from external banking transactions.
+
+### 🔐 Secure Authentication
+
+Use JWT-based authentication and protected backend resources.
 
 ---
 
 # 🚀 Future Improvements
-
-Potential future enhancements:
 
 * 📱 React Native mobile application
 * 🔔 Real-time transaction notifications
@@ -521,31 +743,68 @@ Potential future enhancements:
 * 📊 Advanced transaction analytics
 * 💳 Virtual cards
 * 🧾 Digital transaction receipts
-* 🔄 Transaction retry & reconciliation mechanisms
+* 🔄 Transaction retry and reconciliation
 * 🏦 Support for additional banking providers
-* 📈 Admin financial dashboard
-* 🔍 Advanced fraud detection
-* 🛡️ Transaction limits and risk controls
+* 📈 Advanced admin financial dashboard
+* 🔍 Fraud detection and risk scoring
+* 🛡️ Transaction limits
 * 📜 Complete audit logging
+* 🔔 Push notifications
+* 📱 Mobile banking experience
+
+---
+
+# 📁 Project Structure
+
+```text
+ZWallet/
+│
+├── backend/
+│   ├── src/
+│   │   ├── jopacc-client/
+│   │   └── ...
+│   ├── prisma/
+│   ├── .env.example
+│   └── package.json
+│
+├── frontend/
+│   ├── src/
+│   ├── public/
+│   ├── .env.example
+│   └── package.json
+│
+├── .gitignore
+└── README.md
+```
 
 ---
 
 # 💡 The Core Idea
 
-Traditional transfers often rely on the sender correctly entering an account number.
+Traditional bank transfers often depend on the sender correctly entering or selecting the recipient's information.
 
-**ZWallet adds another question before money moves:**
+**ZWallet introduces an additional confirmation step before money moves:**
 
 > **"Is this really the person you intended to send money to?"**
 
-By combining **recipient identity confirmation, voice verification, internal wallet transfers, and Open Banking infrastructure**, ZWallet aims to make digital transfers safer and more transparent.
+By combining:
+
+**Recipient Identity + Voice Verification + Internal Wallet Ledger + Open Banking**
+
+ZWallet aims to make person-to-person transfers **safer, clearer, and more transparent**.
 
 ---
 
 <div align="center">
 
-### 💳 Verify. Confirm. Transfer. Safely.
+## 💳 Verify. Confirm. Transfer. Safely.
 
-**ZWallet — Making person-to-person payments safer.**
+### ZWallet
+
+**Making person-to-person payments safer.**
+
+<br />
+
+⭐ *Built with NestJS, React, PostgreSQL & JoPACC Open Banking*
 
 </div>
