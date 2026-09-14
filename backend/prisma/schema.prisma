@@ -1,0 +1,162 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum BankAccountStatus {
+  ACTIVE
+  SUSPENDED
+  CLOSED
+}
+
+enum TransactionType {
+  TOPUP
+  TRANSFER_OUT
+  TRANSFER_IN
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  CANCELLED
+  FAILED
+}
+
+enum RecipientType {
+  INTERNAL_USER
+  EXTERNAL_IBAN
+}
+
+enum UserRole {
+  ADMIN
+  CUSTOMER
+}
+
+enum RefundRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  FAILED
+}
+
+model User {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  passwordHash  String
+  fullName      String
+  phone         String?  @unique
+  avatarUrl     String?
+  role          UserRole @default(CUSTOMER)
+  walletBalance Decimal  @default(0) @db.Decimal(18, 2)
+  heldBalance   Decimal  @default(0) @db.Decimal(18, 2)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  linkedAccounts    LinkedBankAccount[]
+  transactions      WalletTransaction[] @relation("OwnerTransactions")
+  incomingTransfers WalletTransaction[] @relation("RecipientTransactions")
+
+  refundRequestsMade     RefundRequest[] @relation("RefundRequester")
+  refundRequestsReceived RefundRequest[] @relation("RefundTarget")
+}
+
+model LinkedBankAccount {
+  id                 String            @id @default(uuid())
+  userId             String
+  user               User              @relation(fields: [userId], references: [id])
+  accountId          String            @unique
+  iban               String            @unique
+  customerId         String?
+  accountStatus      BankAccountStatus
+  accountType        String?
+  currency           String
+  holderName         String?
+  institutionName    String?
+  institutionBic     String?
+  branchName         String?
+  lockedForCredit    Boolean           @default(false)
+  lockedForDebit     Boolean           @default(false)
+  isPrimary          Boolean           @default(true)
+  label              String?
+  linkedAt           DateTime          @default(now())
+  rawAccountsPayload Json?
+
+  topups WalletTransaction[]
+
+  @@index([userId])
+}
+
+model WalletTransaction {
+  id       String             @id @default(uuid())
+  type     TransactionType
+  status   TransactionStatus
+  amount    Decimal            @db.Decimal(18, 2)
+  currency  String             @default("JOD")
+  feeAmount Decimal            @default(0) @db.Decimal(18, 2)
+
+  ownerId String
+  owner   User   @relation("OwnerTransactions", fields: [ownerId], references: [id])
+
+  recipientType     RecipientType?
+  recipientUserId   String?
+  recipientUser     User?          @relation("RecipientTransactions", fields: [recipientUserId], references: [id])
+  recipientIban     String?
+  recipientSnapshot Json?
+
+  linkedBankAccountId String?
+  linkedBankAccount   LinkedBankAccount? @relation(fields: [linkedBankAccountId], references: [id])
+
+  pendingExpiresAt DateTime?
+  resolvedAt       DateTime?
+
+  counterpartTransactionId String?
+  counterpartTransaction   WalletTransaction?  @relation("Counterpart", fields: [counterpartTransactionId], references: [id])
+  counterpartOf            WalletTransaction[] @relation("Counterpart")
+
+  jopaccCallType        String?
+  jopaccRequestPayload  Json?
+  jopaccResponsePayload Json?
+  jopaccMessageId       String?
+  failureReason         String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  refundClaims   RefundRequest[] @relation("RefundOriginal")
+  refundResultOf RefundRequest?  @relation("RefundResult")
+
+  @@index([ownerId])
+  @@index([status, pendingExpiresAt])
+}
+
+model RefundRequest {
+  id          String @id @default(uuid())
+  requesterId String
+  requester   User   @relation("RefundRequester", fields: [requesterId], references: [id])
+  targetId    String
+  target      User   @relation("RefundTarget", fields: [targetId], references: [id])
+
+  amount   Decimal @db.Decimal(18, 2)
+  currency String  @default("JOD")
+  reason   String
+
+  originalTransactionId String?
+  originalTransaction   WalletTransaction? @relation("RefundOriginal", fields: [originalTransactionId], references: [id])
+
+  status               RefundRequestStatus @default(PENDING)
+  resultTransactionId  String?             @unique
+  resultTransaction    WalletTransaction?  @relation("RefundResult", fields: [resultTransactionId], references: [id])
+  failureReason        String?
+
+  createdAt  DateTime  @default(now())
+  resolvedAt DateTime?
+
+  @@index([requesterId])
+  @@index([targetId])
+}
